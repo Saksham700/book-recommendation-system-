@@ -1,0 +1,23 @@
+chapters.csv head:
+   chapter_id  chapter_sequence_no  book_id  author_id published_date                                      tags
+0     2812946                    1   139726      66847     1990-03-22                            Fantasy|Horror
+1     4330764                    2   139726      66847     1990-04-09      Fantasy|Young Adult|Literary Fiction
+2     2664499                    3   139726      66847     1990-04-07                                   Fantasy
+3     2260666                    4   139726      66847     1990-05-18                  Literary Fiction|Fantasy
+4     6069976                    1   191772      62262     2008-07-30  Horror|Young Adult|Romance|Graphic Novel
+
+chapters.csv columns:
+Index(['chapter_id', 'chapter_sequence_no', 'book_id', 'author_id',
+       'published_date', 'tags'],
+      dtype='object')
+
+interactions.csv head:
+        user_id  chapter_id  book_id
+0  user_2378720     5894067   444295
+1  user_2321122     2532511   785684
+2  user_2335775     6777764   999595
+3  user_7906001     7366896   748410
+4  user_9981689     7853186   418083
+
+interactions.csv columns:
+Index(['user_id', 'chapter_id', 'book_id'], dtype='object')
