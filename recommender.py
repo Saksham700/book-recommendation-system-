@@ -6,7 +6,19 @@ import argparse
 import sys
 
 class BookRecommender:
+    """
+    A Content-Based Recommender System that predicts the next book a user should read.
+    It leverages chapter interactions to calculate a 'completion rate' proxy for implicit ratings,
+    and uses TF-IDF on book metadata (tags and author) to serve recommendations.
+    """
     def __init__(self, chapters_path='chapters.csv', interactions_path='interactions.csv'):
+        """
+        Initializes the BookRecommender.
+        
+        Args:
+            chapters_path (str): Path to chapters.csv
+            interactions_path (str): Path to interactions.csv
+        """
         self.chapters_path = chapters_path
         self.interactions_path = interactions_path
         self.df_c = None
@@ -18,6 +30,10 @@ class BookRecommender:
         self.popular_books = []
         
     def load_and_preprocess(self):
+        """
+        Loads the CSV datasets, calculates implicit ratings (completion rate),
+        and builds the TF-IDF feature space for computation.
+        """
         print("Loading data...")
         self.df_c = pd.read_csv(self.chapters_path)
         self.df_i = pd.read_csv(self.interactions_path)
@@ -66,6 +82,18 @@ class BookRecommender:
         self.tfidf_matrix = self.vectorizer.fit_transform(self.books['content_features'])
         
     def recommend(self, user_id, top_n=5):
+        """
+        Generates book recommendations for a specific user.
+        If the user lacks history (cold-start), returns globally popular books.
+        Otherwise, builds a user profile from read books and returns highest similarity items.
+        
+        Args:
+            user_id (str): The ID of the user (e.g. 'user_2378720')
+            top_n (int): Number of books to recommend.
+            
+        Returns:
+            list: A list of recommended book_ids.
+        """
         if user_id not in self.user_book['user_id'].values:
             return self.popular_books[:top_n]
             
@@ -112,6 +140,11 @@ class BookRecommender:
         return recommendations
 
     def evaluate(self):
+        """
+        Runs an offline evaluation of the ranking algorithm.
+        Samples 1000 users, hides their most 'completed/liked' book,
+        and computes Recall@10 based on whether the recommender retrieves it.
+        """
         print("Running offline evaluation on a sampled hold-out set...")
         sample_users = self.user_book['user_id'].drop_duplicates().sample(1000, random_state=42).tolist()
         hits = 0

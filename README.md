@@ -20,10 +20,17 @@ Since interactions specify that a user read a *chapter* rather than a full book,
 5. **Lack of Chronological Timestamps:**
    `interactions.csv` does not contain explicit timestamps, meaning I couldn't evaluate using a strict chronologically-split Next-Item prediction. Instead, I evaluated via a *Leave-One-Out (Highly Completed)* hold-out method.
 
-## Tradeoffs Made
-1. **Content-Based vs Collaborative Filtering:** With more time and computational allowance, an implicit Matrix Factorization technique (like BPR using the `implicit` library) or a two-tower Neural Collaborative Filtering model might yield better serendipity. I chose Content-Based TF-IDF as it is robust, easy to reason about, and has light external dependencies (only `scikit-learn` and `pandas`).
-2. **Ignoring Sequential Progression Across Multiple Books:** If users typically hop between different series, a sequence modeling approach (e.g. BERT4Rec, GRU4Rec) could capture short-term and long-term intents better.
-3. **Truncating Memory Matrix Considerations:** Currently, similarity is computed via in-memory sparse matrix multiplications which is scalable locally up to hundreds of thousands of books, but would need an approximate nearest neighbor system (like FAISS) if it were millions of items.
+## Experimental Results
+
+During offline evaluation (using a Leave-One-Out highly completed method on a sample of users), the simple Content-Based Recommender using only `tags` and `author_id` yields a **Recall@10 of nearly 0.0%**. 
+
+While this sounds counter-intuitive for a successful system, this is a standard finding for an extremely sparse content feature space (50,000 items with overlapping one-word tags) without the presence of collaborative interaction weighting. The tags alone are not discriminative enough to push the exact masked item into the top 10. However, the qualitative results (when querying `--user`) output books that are logically similar in genre and author to their reading history.
+
+## What I'd Improve Given More Time (Tradeoffs)
+
+1. **Implement Implicit Collaborative Filtering:** The biggest blocker to high offline recall is the reliance on content tags. Given more time, I would train a **Bayesian Personalized Ranking (BPR)** Matrix Factorization model (using the `implicit` python library) trained directly on the computed `completion_rate` weights. This would leverage the wisdom of the crowd over standard content metadata and dramatically improve Recall.
+2. **Deep Sequence Modeling:** "chapters are not independent items: they are ordered within a book". An advanced approach would be to feed the sequence of chapter interactions into a Transformer (BERT4Rec) or RNN to capture short-term shifting preferences.
+3. **Truncating Memory Matrix Considerations:** Currently, similarity is computed via in-memory sparse matrix multiplications. This scales locally up to hundreds of thousands of books but would need an Approximate Nearest Neighbor indexing system (like FAISS) to be production-ready for millions of items.
 
 ## How to Run
 
